@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
 
 import it.polito.tdp.meteo.model.Rilevamento;
 
@@ -38,10 +39,58 @@ public class MeteoDAO {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public List<String> getAllLocalita() {
 
-	public List<Rilevamento> getAllRilevamentiLocalitaMese(int mese, String localita) {
+		final String sql = "SELECT distinct Localita FROM situazione";
 
-		return null;
+		List<String> localita = new ArrayList<String>();
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+
+				localita.add(rs.getString("Localita"));
+			}
+
+			conn.close();
+			return localita;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+
+	public List<Rilevamento> getAllRilevamentiLocalitaMese(int mese) {
+		
+		int umidita = 0;
+		int somma;
+		int n;
+		Date data = null;
+		
+		List<Rilevamento> tempR = new ArrayList<>();
+		
+		for(String loc: getAllLocalita()) {
+			somma = 0;
+			n = 0;
+			for(Rilevamento r: getAllRilevamenti()) {
+				if(r.getLocalita().equals(loc) && r.getData().getMonth()==mese-1) {
+					somma += r.getUmidita();
+					n++;
+				}
+			}
+			umidita = somma/n;
+			tempR.add(new Rilevamento(loc,data,umidita));
+		}
+		
+		return tempR;
 	}
 
 
