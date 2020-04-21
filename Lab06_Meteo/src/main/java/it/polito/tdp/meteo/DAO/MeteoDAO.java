@@ -12,11 +12,27 @@ import it.polito.tdp.meteo.model.Rilevamento;
 
 public class MeteoDAO {
 	
+	private List<Rilevamento> allRilevamenti = new ArrayList<>();
+	private List<String> allLocalita = new ArrayList<>();
+	
+	public MeteoDAO() {
+		allRilevamenti = new ArrayList<Rilevamento>(riempiAllRilevamenti());
+		allLocalita = new ArrayList<String>(riempiAllLocalita());
+	}
+	
 	public List<Rilevamento> getAllRilevamenti() {
+		return allRilevamenti;
+	}
+
+	public List<String> getAllLocalita() {
+		return allLocalita;
+	}
+
+	private List<Rilevamento> riempiAllRilevamenti() {
 
 		final String sql = "SELECT Localita, Data, Umidita FROM situazione ORDER BY data ASC";
 
-		List<Rilevamento> rilevamenti = new ArrayList<Rilevamento>();
+		//List<Rilevamento> rilevamenti = new ArrayList<Rilevamento>();
 
 		try {
 			Connection conn = ConnectDB.getConnection();
@@ -27,11 +43,11 @@ public class MeteoDAO {
 			while (rs.next()) {
 
 				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
-				rilevamenti.add(r);
+				allRilevamenti.add(r);
 			}
 
 			conn.close();
-			return rilevamenti;
+			return allRilevamenti;
 
 		} catch (SQLException e) {
 
@@ -40,11 +56,11 @@ public class MeteoDAO {
 		}
 	}
 	
-	public List<String> getAllLocalita() {
+	private List<String> riempiAllLocalita() {
 
 		final String sql = "SELECT distinct Localita FROM situazione";
 
-		List<String> localita = new ArrayList<String>();
+		//List<String> localita = new ArrayList<String>();
 
 		try {
 			Connection conn = ConnectDB.getConnection();
@@ -54,11 +70,11 @@ public class MeteoDAO {
 
 			while (rs.next()) {
 
-				localita.add(rs.getString("Localita"));
+				allLocalita.add(rs.getString("Localita"));
 			}
 
 			conn.close();
-			return localita;
+			return allLocalita;
 
 		} catch (SQLException e) {
 
@@ -77,10 +93,10 @@ public class MeteoDAO {
 		
 		List<Rilevamento> tempR = new ArrayList<>();
 		
-		for(String loc: getAllLocalita()) {
+		for(String loc: allLocalita) {
 			somma = 0;
 			n = 0;
-			for(Rilevamento r: getAllRilevamenti()) {
+			for(Rilevamento r: allRilevamenti) {
 				if(r.getLocalita().equals(loc) && r.getData().getMonth()==mese-1) {
 					somma += r.getUmidita();
 					n++;

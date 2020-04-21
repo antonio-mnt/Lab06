@@ -15,10 +15,13 @@ public class Model {
 	private MeteoDAO mdao;
 	private List<Rilevamento> rilevamenti;
 	private List<Rilevamento> soluzione ;
-	private int bestCosto = 1000000000;
+	private int bestCosto;
 
 	public Model() {
 		mdao = new MeteoDAO();
+		bestCosto = 1000000000;
+		soluzione = new ArrayList<>();
+		rilevamenti = new ArrayList<>();
 	}
 	
 	public void trovaRilevamenti(int mese) {
@@ -47,6 +50,8 @@ public class Model {
 	public List<Rilevamento> trovaSequenza(int mese) {
 		
 		trovaRilevamenti(mese);
+		soluzione = new ArrayList<>();
+		bestCosto = 1000000000;
 		
 		List<Rilevamento> parziale = new ArrayList<>();
 		
